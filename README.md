@@ -1,4 +1,4 @@
-# turtle.js
+# Turtle.JS
 
 A Python turtle-like API for JS and HTML5 Canvas.
 
