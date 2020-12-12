@@ -1,10 +1,9 @@
-import { Turtle, TCanvas, range } from "./main.js";
+import { Turtle, TCanvas, range } from "../main.js";
 
 let canvas = new TCanvas("c");
 let turtle = new Turtle(canvas);
 
-turtle.color("yellow", "#bdbf2a");
-turtle.penSize(2);
+turtle.color("transparent", "yellow");
 
 turtle.goto(150, 30);
 
