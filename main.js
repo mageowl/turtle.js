@@ -25,18 +25,19 @@ export class TCanvas {
 		// 	this.ctx.lineCap = style.lineCap;
 		// 	this.ctx.fillStyle = style.fillColor;
 		// }
-		color(fill, stroke) {
+		style(fill, stroke, penSize) {
 			this.ctx.fillStyle = fill;
 			this.ctx.strokeStyle = stroke;
+			this.ctx.lineWidth = penSize;
 		}
 	};
 
-	constructor(id, options = {}) {
+	constructor(id, { pixelate = true } = {}) {
 		this.#el = document.getElementById(id);
 		this.#ctx = this.#el.getContext("2d");
 		this.#access.canvas = this;
 		this.#access.ctx = this.#ctx;
-		if (options?.pixelate) {
+		if (pixelate) {
 			this.#el.style.imageRendering = "pixelated";
 		}
 	}
@@ -58,13 +59,11 @@ export class Turtle {
 	#x = 0;
 	#y = 0;
 
-	#startX;
-	#startY;
-
 	#direction = 0;
 	#pen = "up";
 	#fillColor = "black";
 	#strokeColor = "black";
+	#penSize = 1;
 
 	#privateData = {
 		/** @type {TCanvas} */
@@ -124,6 +123,10 @@ export class Turtle {
 		this.#y = y;
 	}
 
+	penSize(size) {
+		this.#penSize = size;
+	}
+
 	get x() {
 		return this.#x;
 	}
@@ -147,12 +150,14 @@ export class Turtle {
 
 	beginFill() {
 		this.#pen = "fill";
-		this.#startX = this.#x;
-		this.#startY = this.#y;
 	}
 
 	end() {
-		this.#privateData.canvasAccess.color(this.#fillColor, this.#strokeColor);
+		this.#privateData.canvasAccess.style(
+			this.#fillColor,
+			this.#strokeColor,
+			this.#penSize
+		);
 		if (this.#pen == "stroke")
 			this.#privateData.canvasAccess.ctx.stroke(this.#path);
 		else if (this.#pen == "fill") {
