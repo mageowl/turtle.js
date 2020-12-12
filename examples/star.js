@@ -1,4 +1,5 @@
-import { Turtle, TCanvas, range } from "../main.js";
+import { Turtle, TCanvas, util } from "../main.js";
+const { range } = util;
 
 let canvas = new TCanvas("c");
 let turtle = new Turtle(canvas);
