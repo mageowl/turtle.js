@@ -7,27 +7,5 @@
 	<body>
 		<canvas id="c"></canvas>
 	</body>
-	<script type="module">
-		import { Turtle, TCanvas } from "./main.js";
-
-		let canvas = new TCanvas("c", {
-			pixelate: true
-		});
-
-		let turtle = new Turtle(canvas);
-
-		turtle.color("blue", "green");
-
-		turtle.beginFill();
-		turtle.right(45);
-		turtle.forward(50);
-		turtle.left(45);
-		turtle.forward(50);
-		turtle.left(45);
-		turtle.forward(50);
-		turtle.home();
-		turtle.end();
-
-		turtle.style.lineColor = "red";
-	</script>
+	<script type="module" src="test.js"></script>
 </html>
