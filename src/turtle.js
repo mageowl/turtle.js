@@ -8,6 +8,8 @@ function randomAccessCode() {
 	return code;
 }
 
+const _ = Symbol("_");
+
 /**
  * Turtle API
  *
@@ -15,34 +17,31 @@ function randomAccessCode() {
  * @class Turtle
  */
 export class Turtle {
-	#x = 0;
-	#y = 0;
+	[_] = {
+		x: 0,
+		y: 0,
 
-	#direction = 0;
-	#pen = "up";
-	#fillColor = "black";
-	#strokeColor = "black";
-	#penSize = 1;
+		direction: 0,
+		pen: "none",
+		strokeColor: "black",
+		fillColor: "black",
+		penSize: 1,
+		penCap: "butt",
+		penJoin: "milter",
 
-	#privateData = {
 		/** @type {TCanvas} */
 		canvas: null,
-		canvasAccess: null
+		canvasAccess: null,
+
+		path: new Path2D(),
+		paths: []
 	};
-	#activeAccessCodes = [];
-
-	#path = new Path2D();
-
-	#paths = [];
 
 	/**
 	 * @param {TCanvas} canvas Canvas object from which to draw on.
 	 */
 	constructor(canvas) {
-		let accessCode = randomAccessCode();
-		this.#activeAccessCodes.push(accessCode);
-		canvas._connectTurtle(this, accessCode);
-		this.#path.moveTo(0, 0);
+		canvas._connectTurtle(this, _);
 	}
 
 	/**
@@ -52,17 +51,19 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	forward(distance) {
-		let x = this.#x + Math.sin(this.#direction + 1.5707963267948966) * distance;
-		let y = this.#y + Math.cos(this.#direction + 1.5707963267948966) * distance;
+		let x =
+			this[_].x + Math.sin(this[_].direction + 1.5707963267948966) * distance;
+		let y =
+			this[_].y + Math.cos(this[_].direction + 1.5707963267948966) * distance;
 
-		if (this.#pen != "up") {
-			this.#path.lineTo(x, y);
+		if (this[_].pen != "none") {
+			this[_].path.lineTo(x, y);
 		} else {
-			this.#path.moveTo(x, y);
+			this[_].path.moveTo(x, y);
 		}
 
-		this.#x = x;
-		this.#y = y;
+		this[_].x = x;
+		this[_].y = y;
 	}
 
 	/**
@@ -82,7 +83,7 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	right(degrees) {
-		this.#direction -= degrees * (Math.PI / 180);
+		this[_].direction -= (degrees % 360) * (Math.PI / 180);
 	}
 
 	/**
@@ -92,7 +93,11 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	left(degrees) {
-		this.#direction += degrees * (Math.PI / 180);
+		this[_].direction += (degrees % 360) * (Math.PI / 180);
+	}
+
+	rotation(degrees) {
+		this[_].direction = (degrees % 360) * (Math.PI / 180);
 	}
 
 	/**
@@ -103,24 +108,14 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	goto(x, y) {
-		if (this.#pen != "up") {
-			this.#path.lineTo(x, y);
+		if (this[_].pen != "none") {
+			this[_].path.lineTo(x, y);
 		} else {
-			this.#path.moveTo(x, y);
+			this[_].path.moveTo(x, y);
 		}
 
-		this.#x = x;
-		this.#y = y;
-	}
-
-	/**
-	 * Set pen size.
-	 *
-	 * @param {number} size Pen size (in pixels)
-	 * @memberof Turtle
-	 */
-	penSize(size) {
-		this.#penSize = size;
+		this[_].x = x;
+		this[_].y = y;
 	}
 
 	/**
@@ -130,7 +125,7 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	get x() {
-		return this.#x;
+		return this[_].x;
 	}
 
 	/**
@@ -140,23 +135,55 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	get y() {
-		return this.#y;
+		return this[_].y;
 	}
 
 	get canvas() {
-		return this.#privateData.canvas;
+		return this[_].privateData.canvas;
 	}
 
 	/**
-	 * Set colors of turtle
+	 * Set colors of turtle.
 	 *
-	 * @param {string} [stroke="black"] Stroke color
+	 * @param {string} stroke Stroke color
 	 * @param {string} [fill="transparent"] Fill color
 	 * @memberof Turtle
 	 */
-	color(stroke = "black", fill = "transparent") {
-		this.#fillColor = fill;
-		this.#strokeColor = stroke;
+	color(stroke, fill = "transparent") {
+		this[_].strokeColor = stroke;
+		this[_].fillColor = fill;
+	}
+
+	/**
+	 * Set fill color of turtle.
+	 *
+	 * @param {string} fill Fill color
+	 * @memberof Turtle
+	 */
+	fillColor(fill) {
+		this[_].fillColor = fill;
+	}
+
+	/**
+	 * Set pen size.
+	 *
+	 * @param {number} size Pen size (in pixels)
+	 * @memberof Turtle
+	 */
+	penSize(size) {
+		this[_].penSize = size;
+	}
+
+	/**
+	 * Set pen cap and join method.
+	 *
+	 * @param {("butt"|"square"|"round")} cap Pen cap
+	 * @param {("milter"|"bevel"|"round")} [join] Join type
+	 * @memberof Turtle
+	 */
+	penCap(cap, join) {
+		this[_].penCap = cap;
+		if (join) this[_].penJoin = join;
 	}
 
 	/**
@@ -165,7 +192,7 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	beginStroke() {
-		this.#pen = "stroke";
+		this[_].pen = "stroke";
 	}
 
 	/**
@@ -174,7 +201,7 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	beginFill() {
-		this.#pen = "fill";
+		this[_].pen = "fill";
 	}
 
 	/**
@@ -183,21 +210,22 @@ export class Turtle {
 	 * @memberof Turtle
 	 */
 	end() {
-		this.#privateData.canvasAccess.style(
-			this.#fillColor,
-			this.#strokeColor,
-			this.#penSize
+		this[_].canvasAccess.pen(
+			this[_].fillColor,
+			this[_].strokeColor,
+			this[_].penSize,
+			this[_].penCap,
+			this[_].penJoin
 		);
-		if (this.#pen == "stroke")
-			this.#privateData.canvasAccess.ctx.stroke(this.#path);
-		else if (this.#pen == "fill") {
-			this.#privateData.canvasAccess.ctx.fill(this.#path);
-			this.#privateData.canvasAccess.ctx.stroke(this.#path);
+		if (this[_].pen == "stroke") this[_].canvasAccess.ctx.stroke(this[_].path);
+		else if (this[_].pen == "fill") {
+			this[_].canvasAccess.ctx.fill(this[_].path);
+			this[_].canvasAccess.ctx.stroke(this[_].path);
 		}
 
-		this.#pen = "up";
-		this.#paths.push(this.#path);
-		this.#path = new Path2D();
+		this[_].pen = "none";
+		this[_].paths.push(this[_].path);
+		this[_].path = new Path2D();
 	}
 
 	/**
@@ -207,19 +235,19 @@ export class Turtle {
 	 */
 	home() {
 		this.goto(0, 0);
-		this.#direction = 0;
+		this[_].direction = 0;
 	}
 
 	_setPrivate(name, value, accessCode) {
-		if (this.#activeAccessCodes.includes(accessCode)) {
-			this.#privateData[name] = value;
+		if (this[_].activeAccessCodes.includes(accessCode)) {
+			this[_].privateData[name] = value;
 		}
 	}
 
 	_closeAccessCode(accessCode) {
-		if (this.#activeAccessCodes.includes(accessCode)) {
-			this.#activeAccessCodes.splice(
-				this.#activeAccessCodes.indexOf(accessCode),
+		if (this[_].activeAccessCodes.includes(accessCode)) {
+			this[_].activeAccessCodes.splice(
+				this[_].activeAccessCodes.indexOf(accessCode),
 				1
 			);
 		}

@@ -4,7 +4,8 @@ const { range } = util;
 let canvas = new TCanvas("c");
 let turtle = new Turtle(canvas);
 
-turtle.color("transparent", "yellow");
+turtle.color("orange", "yellow");
+turtle.penSize(3);
 
 turtle.goto(150, 30);
 

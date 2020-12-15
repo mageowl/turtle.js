@@ -1,33 +1,33 @@
-export class TCanvas {
-	#el;
-	/**
-	 * @type {CanvasRenderingContext}
-	 */
-	#ctx;
+const _ = Symbol("_");
 
-	#access = {
-		canvas: null,
+export class TCanvas {
+	el = null;
+
+	[_] = {
 		ctx: null,
-		style(fill, stroke, penSize) {
+		pen(fill, stroke, size, cap, join) {
 			this.ctx.fillStyle = fill;
 			this.ctx.strokeStyle = stroke;
-			this.ctx.lineWidth = penSize;
+			this.ctx.lineWidth = size;
+			this.ctx.lineCap = cap;
+			this.ctx.lineJoin = join;
 		}
 	};
 
 	constructor(id, { pixelate = true } = {}) {
-		this.#el = document.getElementById(id);
-		this.#ctx = this.#el.getContext("2d");
-		this.#access.canvas = this;
-		this.#access.ctx = this.#ctx;
+		this.el = document.getElementById(id);
+		this[_].ctx = this.el.getContext("2d");
 		if (pixelate) {
-			this.#el.style.imageRendering = "pixelated";
+			this.el.style.imageRendering = "pixelated";
 		}
 	}
 
-	_connectTurtle(turtle, accessCode) {
-		turtle._setPrivate("canvas", this, accessCode);
-		turtle._setPrivate("canvasAccess", this.#access, accessCode);
-		turtle._closeAccessCode(accessCode);
+	_connectTurtle(turtle, symbol) {
+		turtle[symbol].canvas = this;
+		turtle[symbol].canvasAccess = this[_];
+	}
+
+	clearScreen() {
+		this[_].ctx.clearRect(0, 0, this.el.width, this.el.height);
 	}
 }
