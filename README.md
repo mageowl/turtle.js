@@ -3,7 +3,7 @@
 A Python turtle-like API for JS and HTML5 Canvas.
 
 ```javascript
-#! ./star.js
+#! ./examples/star.js
 import { Turtle, TCanvas, range } from "../main.js";
 
 let canvas = new TCanvas("c");
