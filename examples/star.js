@@ -7,7 +7,7 @@ let turtle = new Turtle(canvas);
 turtle.color("orange", "yellow");
 turtle.penSize(3);
 
-turtle.goto(150, 30);
+turtle.goto(150, 50);
 
 turtle.beginFill();
 for (let i of range(5)) {
